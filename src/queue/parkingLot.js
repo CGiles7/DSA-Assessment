@@ -1,65 +1,76 @@
-const Queue = require("../queue/queue");
-
-/**
- * Implement a Parking Lot.
- *
- */
 class ParkingLot {
-  constructor(capacity, rate) {
-    this.spaces = new Array(capacity).fill("vacant");
+  constructor(totalSpaces, rate) {
+    this.totalSpaces = totalSpaces;
     this.rate = rate;
-    this.revenue = 0;
+    this.vacantSpaces = totalSpaces;
+    this.occupants = new Array(totalSpaces).fill(null).map((_, index) => ({ space: index + 1, licensePlateNumber: "vacant" }));
     this.queue = new Queue();
+    this.totalRevenue = 0;
   }
 
-  /**
-   * Returns the number of vacant parking spaces
-   * @returns {Number}
-   *  the total number of spaces where the value is "vacant".
-   */
-
-  get vacantSpaces() {
-    return this.spaces.reduce(
-      (sum, space, index) => sum + (space === "vacant" ? 1 : 0),
-      0
-    );
+  enter(licensePlateNumber) {
+    if (this.vacantSpaces > 0) {
+      const vacantIndex = this.occupants.findIndex((occupant) => occupant.licensePlateNumber === "vacant");
+      if (vacantIndex !== -1) {
+        const space = vacantIndex + 1;
+        this.occupants[vacantIndex] = { space, licensePlateNumber };
+        this.vacantSpaces--;
+      }
+    } else {
+      this.queue.enqueue(licensePlateNumber);
+    }
   }
 
-  /**
-   * As cars enter the parking lot, the license plate number is entered and the car is parked in the first vacant space.
-   * If the lot is full, the car is added to the queue to be parked when a spot is available.
-   *
-   * @param licensePlateNumber
-   *  the license plate number of the car entering
-   */
-  enter(licensePlateNumber) {}
-
-  /**
-   * As a car leaves the parking lot, or the queue, the leave method is called with the license plate number of the car leaving.
-   * @param licensePlateNumber
-   *    *  the license plate number of the car leaving.
-   */
-  leave(licensePlateNumber) {}
-
-  /**
-   * Lists each space in the parking lot along with the license plate number of the car parked there, or
-   * "vacant" as the license plate if the spot is vacant.
-   * @returns {{licensePlateNumber: string, space: Number}[]}
-   */
-  get occupants() {
-    return this.spaces.map((licensePlateNumber, index) => ({
-      space: index + 1,
-      licensePlateNumber,
-    }));
+  leave(licensePlateNumber) {
+    const index = this.occupants.findIndex((occupant) => occupant.licensePlateNumber === licensePlateNumber);
+    if (index !== -1) {
+      this.occupants[index] = { space: index + 1, licensePlateNumber: "vacant" };
+      this.vacantSpaces++;
+      this.totalRevenue += this.rate;
+      this.parkFromQueue();
+    } else {
+      this.queue.remove(licensePlateNumber); // Add this line to remove the car from the queue.
+    }
   }
 
-  /**
-   * The total cumulative revenue for the parking lot. The parking rate is paid when the car leaves, it does not matter how long the car stays in the spot.
-   * @returns {number}
-   *  the total revenue for the parking lot.
-   */
-  get totalRevenue() {
-    return this.revenue;
+  parkFromQueue() {
+    if (!this.queue.isEmpty() && this.vacantSpaces > 0) {
+      const licensePlateNumber = this.queue.dequeue();
+      const vacantIndex = this.occupants.findIndex((occupant) => occupant.licensePlateNumber === "vacant");
+      const space = vacantIndex + 1;
+      this.occupants[vacantIndex] = { space, licensePlateNumber };
+      this.vacantSpaces--;
+      this.parkFromQueue();
+    }
+  }
+}
+
+class Queue {
+  constructor() {
+    this.items = [];
+  }
+
+  enqueue(item) {
+    this.items.push(item);
+  }
+
+  dequeue() {
+    return this.items.shift();
+  }
+
+  remove(item) {
+    const index = this.items.indexOf(item);
+    if (index !== -1) {
+      this.items.splice(index, 1);
+    }
+  }
+
+  peek() {
+    return this.items[0];
+  }
+
+  isEmpty() {
+    return this.items.length === 0;
   }
 }
 

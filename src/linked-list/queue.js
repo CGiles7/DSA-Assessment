@@ -1,21 +1,29 @@
 const LinkedList = require("./linkedList");
 
-/**
- * Implement a Queue using nothing more than a LinkedList.
- */
-
 class Queue {
   constructor() {
     this.linkedList = new LinkedList();
   }
 
-  enqueue(value) {}
+  enqueue(value) {
+    this.linkedList.insert(value);
+  }
 
-  dequeue() {}
+  dequeue() {
+    // Delegates to the linked list's `remove` method
+    return this.linkedList.remove(() => true); // Always remove the first element
+  }
 
-  peek() {}
+  peek() {
+    if (!this.linkedList.head) {
+      return null;
+    }
+    return this.linkedList.head.value;
+  }
 
-  isEmpty() {}
+  isEmpty() {
+    return !this.linkedList.head;
+  }
 }
 
 module.exports = Queue;

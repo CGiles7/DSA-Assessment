@@ -141,6 +141,15 @@ class LinkedList {
     }
     return matchedNode.value;
   }
+  
+  deleteHead() {
+    if (!this.head) {
+      return null;
+    }
+    const removedHead = this.head;
+    this.head = this.head.next;
+    return removedHead;
+  }
 }
 
 module.exports = LinkedList;

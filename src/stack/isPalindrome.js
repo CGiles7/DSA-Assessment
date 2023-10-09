@@ -1,24 +1,38 @@
-/**
- * A palindrome is a word, phrase, or number that is spelled the same forward and backward.
- * For example, “dad” is a palindrome; “A man, a plan, a canal: Panama” is a palindrome if you take out the spaces and ignore the punctuation;
- * and 1,001 is a numeric palindrome.
- *
- * Use a stack to determine whether or not a given string is a palindrome.
- *
- * The implementation should have O(n) performance.
- *
- * @param text
- *  a possibly empty string that may be a palindrome.
- */
-
 const Stack = require("../stack/stack");
 
 function isPalindrome(text) {
+  // Check if the input text is blank or contains only a single letter
+  if (!text || text.length === 1) {
+    // Check if it's a single capitalized letter
+    if (/^[A-Z]$/.test(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  // Clean the text by removing non-letter and non-digit characters
   const cleanText = text.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
 
-  // TODO: Write an O(n) algorithm that uses a stack to determine whether the given input text is palindrome or not.
+  // Check if the cleaned text is empty (e.g., if it contained only emojis or symbols)
+  if (!cleanText) {
+    return false;
+  }
 
-  return false;
+  let stack = new Stack();
+
+  for (let i = 0; i < cleanText.length; i++) {
+    stack.push(cleanText[i]);
+  }
+
+  let reversedText = "";
+  for (let i = 0; i < cleanText.length; i++) {
+    reversedText += stack.pop();
+  }
+
+  // Use a function to compare without considering spaces and special characters
+  const compareText = (str) => str.replace(/[^a-zA-Z0-9]/g, "");
+
+  return compareText(cleanText) === compareText(reversedText);
 }
 
 module.exports = isPalindrome;

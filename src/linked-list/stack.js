@@ -1,7 +1,3 @@
-/**
- * Implement a Stack using nothing more than a LinkedList.
- */
-
 const LinkedList = require("../linked-list/linkedList");
 
 class Stack {
@@ -9,13 +5,26 @@ class Stack {
     this.linkedList = new LinkedList();
   }
 
-  push(value) {}
+  push(value) {
+    this.linkedList.insertAtHead(value);
+  }
 
-  pop() {}
+  pop() {
+    // Delegate the pop operation to the linked list
+    const removedValue = this.linkedList.remove(() => true);
+    return removedValue;
+  }
 
-  peek() {}
+  peek() {
+    if (!this.linkedList.head) {
+      return null;
+    }
+    return this.linkedList.head.value;
+  }
 
-  isEmpty() {}
+  isEmpty() {
+    return !this.linkedList.head;
+  }
 }
 
 module.exports = Stack;
